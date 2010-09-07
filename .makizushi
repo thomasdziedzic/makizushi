@@ -14,13 +14,19 @@ mkchr() {
   ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1} ${@:2}
 }
 
+mkchrs() {
+  for k in ${!chroots[@]} ; do
+    mkchr ${k} ${@:1}
+  done
+}
+
 mkdchr() {
   ${chroots[$1]} sudo makechrootpkg -r ${chrootdir}/${1} ${@:2}
 }
 
-mkchrs() {
+mkdchrs() {
   for k in ${!chroots[@]} ; do
-    mkchr ${k} ${@:1}
+    mkdchr ${k} ${@:1}
   done
 }
 
