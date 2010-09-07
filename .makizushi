@@ -8,31 +8,43 @@ chroots=(['stable32']='linux32' ['stable64']='linux64')
 packager='Thomas Dziedzic < gostrc at gmail >'
 makeflags='-j2'
 
+alias db-aur='ssh aur.archlinux.org /arch/db-update'
+
+mkchr() {
+  ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1}
+}
+
 mkchrs() {
   for k in ${!chroots[@]} ; do
-    ${chroots[$k]} sudo makechrootpkg -c -r ${chrootdir}/${k}
+    mkchr ${1}
   done
+}
+
+upchr() {
+  ${chroots[$1]} sudo mkarchroot -u ${chrootdir}/${1}/root
 }
 
 upchrs() {
   for k in ${!chroots[@]} ; do
-    ${chroots[$k]} sudo mkarchroot -u ${chrootdir}/${k}/root
+    upchr ${1}
   done
+}
+
+newchr() {
+  sudo mkdir -p ${chrootdir}/${1}
+  ${chroots[$1]} sudo mkarchroot ${chrootdir}/${1}/root base base-devel sudo
+
+  # needed if adding support for [testing]
+  #sudo ${EDITOR} ${chrootdir}/${chrootname[$1]}/root/etc/pacman.conf
+
+  sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${1}/root/etc/makepkg.conf
+  sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${1}/root/etc/makepkg.conf
 }
 
 newchrs() {
   sudo rm -rf ${chrootdir}
 
   for k in ${!chroots[@]} ; do
-    sudo mkdir -p ${chrootdir}/${k}
-    ${chroots[$k]} sudo mkarchroot ${chrootdir}/${k}/root base base-devel sudo
-
-    # needed if adding support for [testing]
-    #sudo ${EDITOR} ${chrootdir}/${chrootname[$i]}/root/etc/pacman.conf
-
-    sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${k}/root/etc/makepkg.conf
-    sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${k}/root/etc/makepkg.conf
+    newchr ${k}
   done
 }
-
-alias db-aur='ssh aur.archlinux.org /arch/db-update'
