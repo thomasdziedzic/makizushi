@@ -11,28 +11,32 @@ makeflags='-j2'
 alias db-aur='ssh aur.archlinux.org /arch/db-update'
 
 mkchr() {
-  ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1}
+  ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1} ${@:2}
+}
+
+mkdchr() {
+  ${chroots[$1]} sudo makechrootpkg -r ${chrootdir}/${1} ${@:2}
 }
 
 mkchrs() {
   for k in ${!chroots[@]} ; do
-    mkchr ${k}
+    mkchr ${k} ${@:1}
   done
 }
 
 upchr() {
-  ${chroots[$1]} sudo mkarchroot -u ${chrootdir}/${1}/root
+  ${chroots[$1]} sudo mkarchroot -u ${chrootdir}/${1}/root ${@:1}
 }
 
 upchrs() {
   for k in ${!chroots[@]} ; do
-    upchr ${k}
+    upchr ${k} ${@:1}
   done
 }
 
 newchr() {
   sudo mkdir -p ${chrootdir}/${1}
-  ${chroots[$1]} sudo mkarchroot ${chrootdir}/${1}/root base base-devel sudo
+  ${chroots[$1]} sudo mkarchroot ${@:1} ${chrootdir}/${1}/root base base-devel sudo
 
   # needed if adding support for [testing]
   #sudo ${EDITOR} ${chrootdir}/${chrootname[$1]}/root/etc/pacman.conf
@@ -45,6 +49,6 @@ newchrs() {
   sudo rm -rf ${chrootdir}
 
   for k in ${!chroots[@]} ; do
-    newchr ${k}
+    newchr ${k} ${@:1}
   done
 }
