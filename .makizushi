@@ -11,50 +11,52 @@ makeflags='-j2'
 alias db-aur='ssh aur.archlinux.org /arch/db-update'
 
 mkchr() {
-  ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1} ${@:2}
-}
-
-mkchrs() {
-  for k in ${!chroots[@]} ; do
-    mkchr ${k} ${@:1}
-  done
+  if [[ ${#} = 0 ]] ; then
+    for k in ${!chroots[@]} ; do
+      ${chroots[$k]} sudo makechrootpkg -c -r ${chrootdir}/${k}
+    done
+  else
+    ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1} ${@:2}
+  fi
 }
 
 mkdchr() {
-  ${chroots[$1]} sudo makechrootpkg -r ${chrootdir}/${1} ${@:2}
-}
-
-mkdchrs() {
-  for k in ${!chroots[@]} ; do
-    mkdchr ${k} ${@:1}
-  done
+  if [[ ${#} = 0 ]] ; then
+    for k in ${!chroots[@]} ; do
+      ${chroots[$k]} sudo makechrootpkg -r ${chrootdir}/${k}
+    done
+  else
+    ${chroots[$1]} sudo makechrootpkg -r ${chrootdir}/${1} ${@:2}
+  fi
 }
 
 upchr() {
-  ${chroots[$1]} sudo mkarchroot -u ${chrootdir}/${1}/root ${@:1}
-}
-
-upchrs() {
-  for k in ${!chroots[@]} ; do
-    upchr ${k} ${@:1}
-  done
-}
-
-newchr() {
-  sudo mkdir -p ${chrootdir}/${1}
-  ${chroots[$1]} sudo mkarchroot ${@:2} ${chrootdir}/${1}/root base base-devel sudo
-
-  # needed if adding support for [testing]
-  #sudo ${EDITOR} ${chrootdir}/${chrootname[$1]}/root/etc/pacman.conf
-
-  sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${1}/root/etc/makepkg.conf
-  sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${1}/root/etc/makepkg.conf
+  if [[ ${#} = 0 ]] ; then
+    for k in ${!chroots[@]} ; do
+      ${chroots[$k]} sudo mkarchroot -u ${chrootdir}/${k}/root
+    done
+  else
+    ${chroots[$1]} sudo mkarchroot -u ${chrootdir}/${1}/root ${@:2}
+  fi
 }
 
 newchrs() {
-  sudo rm -rf ${chrootdir}
+  if [[ ${#} = 0 ]] ; then
+    sudo rm -rf ${chrootdir}
 
-  for k in ${!chroots[@]} ; do
-    newchr ${k} ${@:1}
-  done
+    for k in ${!chroots[@]} ; do
+      sudo mkdir -p ${chrootdir}/${k}
+      ${chroots[$k]} sudo mkarchroot ${chrootdir}/${k}/root base base-devel sudo
+
+      sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${k}/root/etc/makepkg.conf
+      sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${k}/root/etc/makepkg.conf
+    done
+  else
+    sudo rm -rf ${chrootdir}/${1}
+    sudo mkdir -p ${chrootdir}/${1}
+    ${chroots[$1]} sudo mkarchroot ${@:2} ${chrootdir}/${1}/root base base-devel sudo
+
+    sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${1}/root/etc/makepkg.conf
+    sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${1}/root/etc/makepkg.conf
+  fi
 }
