@@ -16,7 +16,7 @@ mkchr() {
 
 mkchrs() {
   for k in ${!chroots[@]} ; do
-    mkchr ${1}
+    mkchr ${k}
   done
 }
 
@@ -26,7 +26,7 @@ upchr() {
 
 upchrs() {
   for k in ${!chroots[@]} ; do
-    upchr ${1}
+    upchr ${k}
   done
 }
 
