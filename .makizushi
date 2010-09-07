@@ -5,7 +5,8 @@ chrootdir='/var/mychroots'
 chrootname=('stable32' 'stable64')
 targetarch=('linux32' 'linux64')
 
-packager="Thomas Dziedzic < gostrc at gmail >"
+packager='Thomas Dziedzic < gostrc at gmail >'
+makeflags='-j2'
 
 mkchrs() {
   for (( i=0; i<${#chrootname[@]}; i++ )); do
@@ -33,6 +34,7 @@ newchrs() {
     sudo echo 'Server = ftp://mirrors.kernel.org/archlinux/$repo/os/$arch' >> sudo ${chrootdir}/${chrootname[$i]}/root/etc/pacman.d/mirrorlist
 
     sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${chrootname[$i]}/root/etc/makepkg.conf
+    sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${chrootname[$i]}/root/etc/makepkg.conf
   done
 }
 
