@@ -2,36 +2,36 @@
 
 chrootdir='/var/mychroots'
 
-chrootname=('stable32' 'stable64')
-targetarch=('linux32' 'linux64')
+declare -A chroots
+chroots=(['stable32']='linux32' ['stable64']='linux64')
 
 packager='Thomas Dziedzic < gostrc at gmail >'
 makeflags='-j2'
 
 mkchrs() {
-  for (( i=0; i<${#chrootname[@]}; i++ )); do
-    ${targetarch[$i]} sudo makechrootpkg -c -r ${chrootdir}/${chrootname[$i]}
+  for k in ${!chroots[@]} ; do
+    ${chroots[$k]} sudo makechrootpkg -c -r ${chrootdir}/${k}
   done
 }
 
 upchrs() {
-  for (( i=0; i<${#chrootname[@]}; i++ )); do
-    ${targetarch[$i]} sudo mkarchroot -u ${chrootdir}/${chrootname[$i]}/root
+  for k in ${!chroots[@]} ; do
+    ${chroots[$k]} sudo mkarchroot -u ${chrootdir}/${k}/root
   done
 }
 
 newchrs() {
   sudo rm -rf ${chrootdir}
 
-  for (( i=0; i<${#chrootname[@]}; i++ )); do
-    sudo mkdir -p ${chrootdir}/${chrootname[$i]}
-    ${targetarch[$i]} sudo mkarchroot ${chrootdir}/${chrootname[$i]}/root base base-devel sudo
+  for k in ${!chroots[@]} ; do
+    sudo mkdir -p ${chrootdir}/${k}
+    ${chroots[$k]} sudo mkarchroot ${chrootdir}/${k}/root base base-devel sudo
 
     # needed if adding support for [testing]
     #sudo ${EDITOR} ${chrootdir}/${chrootname[$i]}/root/etc/pacman.conf
 
-    sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${chrootname[$i]}/root/etc/makepkg.conf
-    sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${chrootname[$i]}/root/etc/makepkg.conf
+    sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${k}/root/etc/makepkg.conf
+    sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${k}/root/etc/makepkg.conf
   done
 }
 
