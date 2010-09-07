@@ -30,9 +30,6 @@ newchrs() {
     # needed if adding support for [testing]
     #sudo ${EDITOR} ${chrootdir}/${chrootname[$i]}/root/etc/pacman.conf
 
-    sudo echo 'Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch' >> sudo ${chrootdir}/${chrootname[$i]}/root/etc/pacman.d/mirrorlist
-    sudo echo 'Server = ftp://mirrors.kernel.org/archlinux/$repo/os/$arch' >> sudo ${chrootdir}/${chrootname[$i]}/root/etc/pacman.d/mirrorlist
-
     sudo sed "s/#PACKAGER=.*/PACKAGER='${packager}'/" -i ${chrootdir}/${chrootname[$i]}/root/etc/makepkg.conf
     sudo sed "s/#MAKEFLAGS=.*/MAKEFLAGS='${makeflags}'/" -i ${chrootdir}/${chrootname[$i]}/root/etc/makepkg.conf
   done
