@@ -42,7 +42,7 @@ upchrs() {
 
 newchr() {
   sudo mkdir -p ${chrootdir}/${1}
-  ${chroots[$1]} sudo mkarchroot "${@:2}" ${chrootdir}/${1}/root base base-devel sudo
+  ${chroots[$1]} sudo mkarchroot ${@:2} ${chrootdir}/${1}/root base base-devel sudo
 
   # needed if adding support for [testing]
   #sudo ${EDITOR} ${chrootdir}/${chrootname[$1]}/root/etc/pacman.conf
