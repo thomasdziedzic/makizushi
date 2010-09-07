@@ -40,7 +40,7 @@ upchr() {
   fi
 }
 
-newchrs() {
+newchr() {
   if [[ ${#} = 0 ]] ; then
     sudo rm -rf ${chrootdir}
 
