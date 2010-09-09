@@ -13,20 +13,20 @@ alias db-aur='ssh aur.archlinux.org /arch/db-update'
 mkchr() {
   if [[ ${#} = 0 ]] ; then
     for k in ${!chroots[@]} ; do
-      ${chroots[$k]} sudo makechrootpkg -c -r ${chrootdir}/${k}
+      ${chroots[$k]} sudo makechrootpkg -c -r ${chrootdir}/${k} -- -L
     done
   else
-    ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1} ${@:2}
+    ${chroots[$1]} sudo makechrootpkg -c -r ${chrootdir}/${1} ${@:2} -- -L
   fi
 }
 
 mkdchr() {
   if [[ ${#} = 0 ]] ; then
     for k in ${!chroots[@]} ; do
-      ${chroots[$k]} sudo makechrootpkg -r ${chrootdir}/${k}
+      ${chroots[$k]} sudo makechrootpkg -r ${chrootdir}/${k} -- -L
     done
   else
-    ${chroots[$1]} sudo makechrootpkg -r ${chrootdir}/${1} ${@:2}
+    ${chroots[$1]} sudo makechrootpkg -r ${chrootdir}/${1} ${@:2} -- -L
   fi
 }
 
